@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0b0e'/%3E%3Cpath d='M6 6h20v20H6z' fill='none' stroke='%232f68e6' stroke-width='2'/%3E%3Cpath d='M11 11h10v10H11z' fill='%232f68e6'/%3E%3C/svg%3E" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#0a0b0e" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <!-- One service worker, two jobs: (1) static hosts (GitHub Pages) cannot
+         send COOP/COEP headers, so it injects them to make the page
+         cross-origin isolated; (2) in production builds it precaches the app
+         shell so the site opens offline and installs as a PWA. Not registered
+         on the dev server (headers already present, no precache list). -->
+    <script src="/coi-serviceworker.js"></script>
+    <script>
+      // Apply the saved theme before first paint to avoid a flash of the
+      // wrong palette. Mirrors src/shell/theme.ts (default: dark).
+      (function () {
+        try {
+          var t = localStorage.getItem('toolbox-theme');
+          document.documentElement.dataset.theme = t === 'light' ? 'light' : 'dark';
+        } catch (e) {
+          document.documentElement.dataset.theme = 'dark';
+        }
+        // Lock scroll while the boot loading screen is up (removed by the
+        // loader controller, or by the safety net below if the bundle fails).
+        document.documentElement.classList.add('tb-loading');
+      })();
+    </script>
+    <meta name="description" content="A toolbox of client-side video, image and audio tools. WebGPU. No upload." />
+    <title>TOOL/BOX · local-first browser tools</title>
+    <script type="module" crossorigin src="/assets/index-DbChkwc3.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-B2t3sVwO.css">
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <!-- Boot loading screen. Static so it paints before the JS bundle parses;
+         src/shell/loading-screen.ts drives the count-up + dismissal. -->
+    <div id="tb-loader" class="tb-loader" role="progressbar" aria-label="Loading TOOL/BOX"
+         aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+      <div class="tb-loader-brand">TOOL<span>/</span>BOX</div>
+      <div class="loading-0002" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <div class="tb-loader-count"><span id="tb-loader-num">0</span><i>%</i></div>
+      <div class="tb-loader-sub">local-first · webgpu<br>loading tools</div>
+      <div class="tb-loader-bar"><span id="tb-loader-bar-fill"></span></div>
+    </div>
+    <script>
+      // Safety net: if the module bundle fails to load, never leave the user
+      // stuck behind the overlay with scroll locked.
+      setTimeout(function () {
+        var l = document.getElementById('tb-loader');
+        if (l && !l.classList.contains('is-done')) {
+          document.documentElement.classList.remove('tb-loading');
+          l.parentNode && l.parentNode.removeChild(l);
+        }
+      }, 9000);
+    </script>
+
+  </body>
+</html>
